@@ -1,0 +1,68 @@
+name: 'Terraform'
+
+on: [push, pull_request]
+
+env:
+  TF_LOG: INFO
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.3.9
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      id: install
+      with:
+        version: v3.7.2
+
+    - name: Terraform Init AKS
+      working-directory: ./terraform/aks
+      id: init-aks
+      run: terraform init
+
+
+    - name: Terraform Plan AKS
+      working-directory: ./terraform/aks
+      id: plan-aks
+      run: terraform plan
+    
+    - name: Terraform Apply AKS
+      working-directory: ./terraform/aks
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve
+      # run: terraform apply -destroy -auto-approve 
+
+    - name: Terraform Init Istio
+      working-directory: ./terraform/istio
+      id: init-istio
+      run: terraform init
+
+    - name: Terraform Plan Istio
+      working-directory: ./terraform/istio
+      id: plan-istio
+      run: terraform plan
+
+    - name: Terraform Apply Istio
+      working-directory: ./terraform/istio
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      # run: terraform apply -auto-approve
+      run: terraform apply -destroy -auto-approve 
