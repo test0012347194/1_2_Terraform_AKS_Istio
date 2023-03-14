@@ -18,7 +18,7 @@ terraform {
     resource_group_name  = "rg_assignment"
     storage_account_name = "storageassignment032023"
     container_name       = "containerassignment032023"
-    key                  = "assignment-istio.tfstate"
+    key                  = "assignment-istio-install.tfstate"
   }
 
 }
