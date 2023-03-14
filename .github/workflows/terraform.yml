@@ -64,5 +64,5 @@ jobs:
     - name: Terraform Apply Istio
       working-directory: ./terraform/istio
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      # run: terraform apply -auto-approve
-      run: terraform apply -destroy -auto-approve 
+      run: terraform apply -auto-approve
+      # run: terraform apply -destroy -auto-approve 
